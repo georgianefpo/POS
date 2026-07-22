@@ -23,3 +23,6 @@ Thumbs.db
 
 # Claude Code (config local da máquina)
 .claude/settings.local.json
+
+# Projeto com repositório git próprio (github.com/georgianefpo/recomendacao-filmes-pgvector)
+recomendacao_filme/
