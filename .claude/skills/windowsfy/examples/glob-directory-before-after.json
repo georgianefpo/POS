@@ -1,0 +1,37 @@
+{
+  "_doc": "Category 5 — glob-expand. Primary fix A points node --test at a directory (requires Node 22+). Primary fix B wraps in glob -c (works for any tool, requires the 'glob' devDependency). No shell-specific fallback exists; CMD and PowerShell cannot expand globs natively.",
+  "before": {
+    "scripts": {
+      "test": "node --test tests/**/*.test.ts",
+      "test:dev": "node --inspect --test --watch tests/**/*.test.ts"
+    }
+  },
+  "after": {
+    "crossPlatformOptionA_directory": {
+      "scripts": {
+        "test": "node --test tests/",
+        "test:dev": "node --inspect --test --watch tests/"
+      },
+      "engines": {
+        "node": ">=22"
+      }
+    },
+    "crossPlatformOptionB_globCli": {
+      "scripts": {
+        "test": "glob -c \"node --test\" \"tests/**/*.test.ts\"",
+        "test:dev": "glob -c \"node --inspect --test --watch\" \"tests/**/*.test.ts\""
+      },
+      "devDependencies": {
+        "glob": "^11.0.0"
+      }
+    },
+    "cmdFallback": null,
+    "powershellFallback": null,
+    "bashFamilyFallback": {
+      "scripts": {
+        "test": "node --test tests/**/*.test.ts",
+        "test:dev": "node --inspect --test --watch tests/**/*.test.ts"
+      }
+    }
+  }
+}

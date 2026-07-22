@@ -1,0 +1,28 @@
+{
+  "_doc": "Category 1 — native-dep. Informational only: packages that need MS BuildTools, Python and VCRedist on Windows. No package.json edit is applied by the skill. Use the wingetPrerequisites block to install the toolchain, and the nodeRequirement note for @tensorflow/tfjs-node specifically. The alternative downgrade swaps tfjs-node for tfjs (pure JS).",
+  "before": {
+    "dependencies": {
+      "@tensorflow/tfjs-node": "^4.22.0",
+      "better-sqlite3": "^11.7.0",
+      "@huggingface/transformers": "^3.7.5"
+    }
+  },
+  "wingetPrerequisites": [
+    "winget install --id Microsoft.VisualStudio.2022.BuildTools",
+    "winget install --id Python.Python.3.14",
+    "winget install --id Microsoft.VCRedist.2015+.x64"
+  ],
+  "nodeRequirement": "@tensorflow/tfjs-node does not support Node 22 on Windows. Use Node 24. See https://nodejs.org/en/blog/migrations/v22-to-v24",
+  "tfjsAlternative": {
+    "dependencies": {
+      "@tensorflow/tfjs": "^4.22.0",
+      "better-sqlite3": "^11.7.0",
+      "@huggingface/transformers": "^3.7.5"
+    },
+    "_note": "Pure-JS replacement for tfjs-node. Lower performance, no native toolchain required. Update import statements: import * as tf from '@tensorflow/tfjs'."
+  },
+  "perArchLoaderPattern": {
+    "_doc": "When a package itself publishes per-arch artifacts (esbuild-style), load them dynamically. Not applicable to the four packages above, which use node-gyp compilation.",
+    "code": "require(`@esbuild/${process.platform}-${process.arch}`)"
+  }
+}

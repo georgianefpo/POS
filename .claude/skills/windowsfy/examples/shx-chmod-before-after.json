@@ -1,0 +1,26 @@
+{
+  "_doc": "Category 4 — unix-cmd (chmod). Primary fix prefixes chmod with shx. On Windows the call is a silent no-op (no executable bit). No native CMD/PowerShell equivalent exists — those fallbacks are not applicable. Bash family keeps chmod as-is.",
+  "before": {
+    "scripts": {
+      "build": "chmod 755 src/index.ts"
+    }
+  },
+  "after": {
+    "crossPlatform": {
+      "scripts": {
+        "build": "shx chmod 755 src/index.ts"
+      },
+      "devDependencies": {
+        "shx": "^0.4.0"
+      }
+    },
+    "cmdFallback": null,
+    "powershellFallback": null,
+    "bashFamilyFallback": {
+      "scripts": {
+        "build": "chmod 755 src/index.ts"
+      }
+    },
+    "_notes": "If the executable bit must be set explicitly during Windows-local development, replace shx chmod with a Node script: const { chmodSync } = require('node:fs'); chmodSync('src/index.ts', 0o755);"
+  }
+}

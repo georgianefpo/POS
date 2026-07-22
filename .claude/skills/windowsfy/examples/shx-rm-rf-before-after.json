@@ -1,0 +1,33 @@
+{
+  "_doc": "Category 4 — unix-cmd (rm -rf). Primary fix prefixes rm -rf with shx. Replace 'before' with 'after.crossPlatform'. CMD and PowerShell fallbacks use native commands; Bash family keeps rm -rf as-is.",
+  "before": {
+    "scripts": {
+      "docker:infra:cleanup": "docker compose down --volumes && rm -rf storage"
+    }
+  },
+  "after": {
+    "crossPlatform": {
+      "scripts": {
+        "docker:infra:cleanup": "docker compose down --volumes && shx rm -rf storage"
+      },
+      "devDependencies": {
+        "shx": "^0.4.0"
+      }
+    },
+    "cmdFallback": {
+      "scripts": {
+        "docker:infra:cleanup": "docker compose down --volumes && rmdir /S /Q storage"
+      }
+    },
+    "powershellFallback": {
+      "scripts": {
+        "docker:infra:cleanup": "docker compose down --volumes && Remove-Item -Recurse -Force storage"
+      }
+    },
+    "bashFamilyFallback": {
+      "scripts": {
+        "docker:infra:cleanup": "docker compose down --volumes && rm -rf storage"
+      }
+    }
+  }
+}

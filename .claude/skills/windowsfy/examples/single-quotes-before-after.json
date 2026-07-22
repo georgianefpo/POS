@@ -1,0 +1,35 @@
+{
+  "_doc": "Category 3 — single-quote. Primary fix escapes single quotes as double-quoted strings inside the JSON value (\\\"…\\\"). Works on every shell. The Bash-family fallback keeps the single quotes (only CMD breaks).",
+  "before": {
+    "scripts": {
+      "start": "browser-sync -w . --server --files 'index.html, data/*.json, js/*.js' --port 3000",
+      "chat:admin": "node src/cli.js --message 'What is the version in the package.json?'"
+    }
+  },
+  "after": {
+    "crossPlatform": {
+      "scripts": {
+        "start": "browser-sync -w . --server --files \"index.html, data/*.json, js/*.js\" --port 3000",
+        "chat:admin": "node src/cli.js --message \"What is the version in the package.json?\""
+      }
+    },
+    "cmdFallback": {
+      "scripts": {
+        "start": "browser-sync -w . --server --files \"index.html, data/*.json, js/*.js\" --port 3000",
+        "chat:admin": "node src/cli.js --message \"What is the version in the package.json?\""
+      }
+    },
+    "powershellFallback": {
+      "scripts": {
+        "start": "browser-sync -w . --server --files 'index.html, data/*.json, js/*.js' --port 3000",
+        "chat:admin": "node src/cli.js --message 'What is the version in the package.json?'"
+      }
+    },
+    "bashFamilyFallback": {
+      "scripts": {
+        "start": "browser-sync -w . --server --files 'index.html, data/*.json, js/*.js' --port 3000",
+        "chat:admin": "node src/cli.js --message 'What is the version in the package.json?'"
+      }
+    }
+  }
+}

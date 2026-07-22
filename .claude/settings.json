@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/nvm4w/nodejs/etc/**)",
+      "PowerShell(npm approve-scripts --help 2>&1)",
+      "Bash(git --version)"
+    ]
+  }
+}

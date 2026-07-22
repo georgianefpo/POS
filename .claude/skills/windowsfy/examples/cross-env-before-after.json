@@ -1,0 +1,38 @@
+{
+  "_doc": "Category 2 — inline-env. Primary fix uses cross-env to make inline env vars work on Windows native shells. Replace the 'before' script with 'after.crossPlatform'. Fallbacks below lock the script to a single shell.",
+  "before": {
+    "scripts": {
+      "start": "DB_NAME=customers node src/index.js",
+      "test": "NODE_ENV=test node --test test/api.test.js"
+    }
+  },
+  "after": {
+    "crossPlatform": {
+      "scripts": {
+        "start": "cross-env DB_NAME=customers node src/index.js",
+        "test": "cross-env NODE_ENV=test node --test test/api.test.js"
+      },
+      "devDependencies": {
+        "cross-env": "^7.0.3"
+      }
+    },
+    "cmdFallback": {
+      "scripts": {
+        "start": "cmd /V:ON /C \"set DB_NAME=customers & node src/index.js\"",
+        "test": "cmd /V:ON /C \"set NODE_ENV=test & node --test test/api.test.js\""
+      }
+    },
+    "powershellFallback": {
+      "scripts": {
+        "start": "$env:DB_NAME='customers'; node src/index.js",
+        "test": "$env:NODE_ENV='test'; node --test test/api.test.js"
+      }
+    },
+    "bashFamilyFallback": {
+      "scripts": {
+        "start": "DB_NAME=customers node src/index.js",
+        "test": "NODE_ENV=test node --test test/api.test.js"
+      }
+    }
+  }
+}
