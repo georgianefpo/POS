@@ -26,3 +26,6 @@ Thumbs.db
 
 # Projeto com repositório git próprio (github.com/georgianefpo/recomendacao-filmes-pgvector)
 recomendacao_filme/
+
+# Projeto com repositório git próprio (github.com/georgianefpo/movie_rating)
+movie_rating/
