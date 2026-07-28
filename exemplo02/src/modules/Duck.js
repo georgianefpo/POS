@@ -130,7 +130,12 @@ class Duck extends Character {
           this.stopAndClearTimeline();
         }
         this.play();
-        this.state = direction.replace('bottom', 'top');
+        // Bug do jogo: directionOfTravel pode devolver '' em casos de borda
+        // (deslocamento ~1px), e state='' quebra o Character. So troca se houver direcao.
+        const nextState = direction.replace('bottom', 'top');
+        if (nextState) {
+          this.state = nextState;
+        }
         options.onStart();
       },
       onComplete: options.onComplete
