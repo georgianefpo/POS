@@ -1,17 +1,60 @@
+<!--
+  ============================================================
+  webai01 — Conversando com a IA nativa do Chrome (Gemini Nano)
+  ============================================================
+  Esta página usa a "Prompt API" do Chrome: uma IA que roda DENTRO
+  do navegador, sem servidor e sem internet pra IA. Você clica no
+  botão, ela responde "Quem inventou o JavaScript?" e o texto aparece
+  aos poucos (streaming), igual ao ChatGPT digitando.
+-->
+
+<!-- BOTÃO: o usuário clica aqui pra iniciar. O id="run" é um "apelido"
+     que o JavaScript usa pra achar este elemento. -->
+<button id="run">Gerar resposta</button>
+
+<!-- CAIXA DE SAÍDA: começa vazia; é aqui que a resposta vai aparecer. -->
 <output id="output"></output>
+
+<!-- Biblioteca pronta "markdown": converte texto em markdown (**negrito**,
+     listas, etc.) para HTML formatado. É a única coisa vinda da internet. -->
 <!-- https://www.jsdelivr.com/package/npm/markdown -->
 <script src="https://cdn.jsdelivr.net/npm/markdown@0.5.0/lib/markdown.min.js"></script>
 
 <script>
+    // Pegamos os dois elementos da tela pelo id e guardamos em variáveis,
+    // pra poder mexer neles depois (são como "controles remotos").
+    // getElementById('output') = "Chrome, me dá o elemento com id 'output'".
     const output = document.getElementById('output');
+    const button = document.getElementById('run');
 
-    ; (async () => {
-        const params = await LanguageModel.params()
-        console.log("Language Model Params:", params);
+    // addEventListener('click', ...) = "fique escutando; quando clicarem
+    // no botão, execute esta função".
+    // O 'async' permite usar 'await' lá dentro (esperar tarefas demoradas).
+    // Precisa ser no clique porque o Chrome só deixa BAIXAR o modelo de IA
+    // se o usuário fez um gesto (regra de segurança do navegador).
+    button.addEventListener('click', async () => {
+        // Desativa o botão enquanto trabalha, pra não clicar várias vezes.
+        button.disabled = true
 
-        const temperature = params.defaultTemperature
-        const topK = params.defaultTopK
+        // LanguageModel é o objeto do Chrome que representa a IA.
+        // availability() responde: 'available' (pronta), 'downloadable'
+        // (precisa baixar), 'downloading' (baixando) ou 'unavailable'
+        // (aparelho não suporta).
+        // 'await' = espere essa resposta chegar antes de continuar.
+        const status = await LanguageModel.availability()
+        console.log("Availability:", status) // console.log = "print" no DevTools (F12)
 
+        // Se o aparelho não suporta, avisa, reativa o botão e PARA aqui.
+        // 'return' encerra a função — não adianta continuar sem IA.
+        if (status === 'unavailable') {
+            output.innerHTML = "IA on-device indisponível neste navegador/dispositivo."
+            button.disabled = false
+            return
+        }
+
+        // INSTRUÇÃO DE SISTEMA: define COMO a IA deve se comportar, antes
+        // de qualquer pergunta. É como dar o "manual" ao atendente.
+        // Troque o content e a personalidade muda (ex.: "responda como pirata").
         const initialPrompts = [
             {
                 role: 'system',
@@ -19,30 +62,54 @@
             }
         ]
 
+        // A pergunta que vamos enviar (fixa, só de exemplo).
         const question = 'Quem inventou o JavaScript?'
-        output.innerHTML = "Gerando resposta...";
+        // innerHTML troca o conteúdo mostrado na caixa da tela.
+        output.innerHTML = "Preparando o modelo..."
 
+        // create() LIGA uma "sessão" de conversa com a IA.
+        // Na PRIMEIRA vez, ele baixa o modelo Gemini Nano (~2 GB).
         const session = await LanguageModel.create({
-            expectedInputLanguages: ["pt"],
-            temperature,
-            topK,
-            initialPrompts,
+            expectedInputLanguages: ["pt"], // avisa que a entrada é em português
+            initialPrompts,                 // a personalidade definida acima
+            // monitor() só é usado enquanto o modelo baixa. O evento
+            // 'downloadprogress' dispara várias vezes; e.loaded vai de 0 a 1.
+            // Math.round(e.loaded * 100) transforma em porcentagem (0.42 -> 42).
+            // A crase com ${...} (template string) insere a variável no texto.
+            monitor(m) {
+                m.addEventListener('downloadprogress', (e) => {
+                    output.innerHTML = `Baixando o modelo Gemini Nano: ${Math.round(e.loaded * 100)}%`
+                })
+            },
         })
 
-        const responseStream = await session.promptStreaming([
+        // promptStreaming envia a PERGUNTA DO USUÁRIO (role: 'user') e devolve
+        // a resposta em PEDACINHOS (tokens), conforme a IA vai gerando —
+        // por isso o texto aparece aos poucos em vez de tudo de uma vez.
+        const responseStream = session.promptStreaming([
             {
                 role: 'user',
                 content: question
             }
         ])
-        output.innerHTML = ""
-        let fullText = ""
+
+        output.innerHTML = ""      // limpa o "Preparando..." pra começar do zero
+        let fullText = ""          // caixinha que vai ACUMULANDO o texto (let = muda)
+        // for await = repete pra cada pedacinho que chega da IA.
         for await (const token of responseStream) {
-            fullText += token;
-            output.innerHTML = markdown.toHTML(fullText);
+            fullText += token;                          // cola o novo pedaço no fim
+            output.innerHTML = markdown.toHTML(fullText); // formata o acumulado e mostra
+            // Reprocessamos o texto TODO a cada token porque o markdown
+            // (ex.: **negrito**) só fica certo quando o fechamento chega.
 
-            // console.log(token)
+            // console.log(token)  // descomente pra ver cada pedaço no console
         }
-    })();
 
+        // Terminou de gerar: reativa o botão pra poder clicar de novo.
+        button.disabled = false
+    })
+
+    // Observação: como NÃO passamos 'temperature' nem 'topK' no create(),
+    // a IA usa os padrões e tende a responder sempre igual (determinística).
+    // Brincar com esses dois valores pra variar a resposta é o tema do webai02.
 </script>

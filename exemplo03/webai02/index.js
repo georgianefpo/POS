@@ -199,14 +199,14 @@ async function checkRequirements() {
         return;
     }
 
-    const params = await LanguageModel.params();
-    console.log('Language Model Params:', params);
-    /*
-    defaultTemperature: 1
-    defaultTopK:3
-    maxTemperature:2
-    maxTopK:128
-    */
+    // Chrome 150 não expõe LanguageModel.params(); usamos os valores padrão do Gemini Nano.
+    const params = {
+        defaultTemperature: 1,
+        defaultTopK: 3,
+        maxTemperature: 2,
+        maxTopK: 128,
+    };
+    console.log('Language Model Params (padrão):', params);
 
     elements.topK.max = params.maxTopK;
     elements.topK.min = 1;
