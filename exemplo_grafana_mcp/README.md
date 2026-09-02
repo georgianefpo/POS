@@ -4,6 +4,129 @@
 
 This directory contains the complete observability and monitoring infrastructure for N|Sentinel, including distributed tracing, metrics collection, log aggregation, and alerting.
 
+## 🚀 Como rodar (passo a passo)
+
+> Esta secao foi escrita para este repositorio. O restante do README veio do
+> repositorio original do curso e descreve a arquitetura da stack.
+
+### Pre-requisitos
+
+| Requisito | Versao | Observacao |
+|---|---|---|
+| Docker Desktop | recente | precisa estar aberto e com o engine rodando |
+| Node.js | 22+ | testado no 24.18 |
+
+### 1. Instalar as dependencias — sao DUAS instalacoes
+
+```bash
+npm install                            # na raiz deste exemplo
+cd _alumnus && npm install && cd ..    # a aplicacao em si
+```
+
+O segundo e' facil de esquecer. Sem ele o VS Code marca erro em
+`_alumnus/tsconfig.json` (`Cannot find type definition file for 'node'`) e
+todos os imports ficam em vermelho — o `tsconfig` esta correto, faltam as
+dependencias.
+
+### 2. Subir a infraestrutura
+
+```bash
+npm run docker:infra:up
+```
+
+Sobe 9 containers e so' retorna quando todos estiverem *healthy*. Na primeira
+vez baixa ~2,7 GB de imagens, entao demora.
+
+| Servico | URL |
+|---|---|
+| Grafana | http://localhost:3000 (entra direto, sem login) |
+| Prometheus | http://localhost:9090 |
+| Loki | http://localhost:3100 |
+| Tempo | http://localhost:3200 |
+| MCP do Grafana | http://localhost:8000/mcp |
+| PostgreSQL | localhost:5433 |
+
+### 3. Subir a aplicacao
+
+```bash
+npm start
+```
+
+A aplicacao sobe em http://localhost:9000, cria o proprio banco e passa a
+disparar requisicoes a cada 2 segundos no endpoint com o bug, alimentando os
+dashboards.
+
+**Fixe o `APPNAME` antes de subir.** Por padrao o nome do servico e' aleatorio
+(`alumnus_app_<4 chars>`, ver `_alumnus/src/util/config.ts`), o que cria um
+servico e um banco novos a cada reinicio — suas consultas no Grafana param de
+achar os dados antigos:
+
+```powershell
+# PowerShell
+$env:APPNAME="alumnus_app"
+$env:DATABASE_URL="postgresql://alumnus:alumnus_dev_password@localhost:5433/alumnus_app"
+npm start
+```
+
+```bash
+# bash
+export APPNAME=alumnus_app
+export DATABASE_URL=postgresql://alumnus:alumnus_dev_password@localhost:5433/alumnus_app
+npm start
+```
+
+### 4. Registrar o MCP do Grafana
+
+Ver [Configuring MCP Integration](#configuring-mcp-integration) abaixo. Este
+repositorio ja' traz os dois arquivos prontos na raiz:
+
+| Cliente | Arquivo |
+|---|---|
+| Claude Code | `.mcp.json` |
+| GitHub Copilot Chat | `.vscode/mcp.json` |
+
+### 5. Fazer o exercicio
+
+O desafio esta' em [`docs/prompt.md`](./docs/prompt.md): descobrir, **usando so'
+a telemetria**, por que o endpoint `/students/db-leaky-connections` retorna 500.
+
+> **Aviso:** o `docs/prompt.md` contem o gabarito (causa raiz, arquivo, linha e
+> a correcao). Se for passar o desafio para outra pessoa, mande apenas o bloco
+> "Single Comprehensive Prompt", nao o arquivo inteiro.
+
+O padrao esperado e' 2 requisicoes com 200 e todas as seguintes com 500. Se ao
+comecar tudo ja' estiver falhando, o pool foi esgotado antes — libere as
+conexoes para restaurar o padrao:
+
+```bash
+curl -X POST http://localhost:9000/students/db-leaky-connections/reset
+```
+
+### Comandos disponiveis
+
+| Comando | O que faz |
+|---|---|
+| `npm start` | sobe a aplicacao |
+| `npm run serve` | idem, com `--watch` |
+| `npm test` | testes E2E (exige a infra no ar) |
+| `npm run docker:infra:up` | sobe a infra |
+| `npm run docker:infra:logs` | logs da infra |
+| `npm run docker:infra:down` | derruba a infra |
+| `npm run docker:infra:cleanup` | derruba e apaga os dados persistidos |
+| `docker compose up` | infra + aplicacao em containers |
+
+### Windows
+
+Os scripts do `package.json` usam `cross-env` e `shx` para funcionar tambem no
+CMD e no PowerShell, onde `NODE_ENV=valor` e `rm -rf` nao existem. Nao troque
+por sintaxe do bash: quebraria no Windows.
+
+Se o comando `docker` falhar com `docker-credential-desktop not found`, o
+terminal foi aberto antes da instalacao do Docker Desktop e herdou o `PATH`
+antigo — abra um terminal novo.
+
+---
+
 ## 🏗️ Architecture Overview
 
 ```
@@ -213,6 +336,10 @@ Application → OTLP (gRPC) → Collector → {
 ### Prerequisites
 - Docker and Docker Compose
 - Node.js 22+ (for running tests locally)
+
+> Para o passo a passo completo em portugues, incluindo os dois `npm install`
+> necessarios, veja [Como rodar (passo a passo)](#-como-rodar-passo-a-passo)
+> no inicio deste README.
 
 ### Docker Compose Files
 
