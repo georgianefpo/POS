@@ -18,7 +18,8 @@ Thumbs.db
 .DS_Store
 
 # Editor
-.vscode/
+.vscode/*
+!.vscode/mcp.json
 .idea/
 
 # Claude Code (config local da máquina)

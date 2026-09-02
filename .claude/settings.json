@@ -3,7 +3,24 @@
     "allow": [
       "Read(//c/nvm4w/nodejs/etc/**)",
       "PowerShell(npm approve-scripts --help 2>&1)",
-      "Bash(git --version)"
+      "Bash(git --version)",
+      "Bash(curl -s -o /dev/null -w \"diag.html: HTTP %{http_code}\\\\n\" http://localhost:8899/webai01/diag.html)",
+      "Bash(curl -s -o /dev/null -w \"8899 webai01: HTTP %{http_code}\\\\n\" http://localhost:8899/webai01/)",
+      "Bash(curl -s \"https://api.github.com/repos/unipds-engenharia-de-ia-aplicada/engenharia-de-software-com-ia-aplicada/contents/modulo01-fundamentos-de-ia-e-llms-para-programadores/exemplo-05-webai03-multimodal\")",
+      "Bash(curl -s -o /dev/null -w \"diag-mm: HTTP %{http_code}\\\\n\" http://localhost:8899/webai03/diag-mm.html)",
+      "PowerShell($sp = \"C:\\\\Users\\\\gg_gb\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Projetos-POS\\\\9ccb05b7-6dad-4e4b-8f44-d2ba3205aecb\\\\scratchpad\"; New-Item -ItemType Directory -Force -Path $sp | Out-Null; git clone --filter=blob:none --no-checkout --depth 1 https://github.com/unipds-engenharia-de-ia-aplicada/engenharia-de-software-com-ia-aplicada.git \"$sp\\\\curso\" 2>&1 | Select-Object -Last 5)",
+      "PowerShell(git -C $sp ls-tree --name-only HEAD)",
+      "PowerShell(git -C $sp ls-tree --name-only HEAD modulo01-fundamentos-de-ia-e-llms-para-programadores/)",
+      "PowerShell(git -C $sp ls-tree -r --name-only HEAD \"modulo01-fundamentos-de-ia-e-llms-para-programadores/exemplo-09-grafana-mcp/\")",
+      "PowerShell(git -C $sp show HEAD:.gitmodules)",
+      "PowerShell($sp = \"C:\\\\Users\\\\gg_gb\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Projetos-POS\\\\9ccb05b7-6dad-4e4b-8f44-d2ba3205aecb\\\\scratchpad\\\\curso\"; git -C $sp sparse-checkout init --cone; git -C $sp sparse-checkout set \"modulo01-fundamentos-de-ia-e-llms-para-programadores/exemplo-09-grafana-mcp/alumnus\"; git -C $sp checkout 2>&1 | Select-Object -Last 3; Get-ChildItem \"$sp\\\\modulo01-fundamentos-de-ia-e-llms-para-programadores\\\\exemplo-09-grafana-mcp\\\\alumnus\" -Force | Select-Object Mode,Name)",
+      "PowerShell($src = \"C:\\\\Users\\\\gg_gb\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Projetos-POS\\\\9ccb05b7-6dad-4e4b-8f44-d2ba3205aecb\\\\scratchpad\\\\curso\\\\modulo01-fundamentos-de-ia-e-llms-para-programadores\\\\exemplo-09-grafana-mcp\\\\alumnus\"; $dst = \"d:\\\\Projetos\\\\POS\\\\exemplo04\"; if \\(Test-Path $dst\\) { \"JA EXISTE - abortando\" } else { Copy-Item -Path $src -Destination $dst -Recurse -Force; \\(Get-ChildItem $dst -Recurse -File -Force\\).Count })",
+      "PowerShell($sp = \"C:\\\\Users\\\\gg_gb\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Projetos-POS\\\\9ccb05b7-6dad-4e4b-8f44-d2ba3205aecb\\\\scratchpad\\\\curso\"; $prefix = \"modulo01-fundamentos-de-ia-e-llms-para-programadores/exemplo-09-grafana-mcp/alumnus/\"; $a = git -C $sp ls-tree -r --name-only HEAD $prefix | ForEach-Object { $_.Substring\\($prefix.Length\\) }; $b = Get-ChildItem \"d:\\\\Projetos\\\\POS\\\\exemplo04\" -Recurse -File -Force | ForEach-Object { $_.FullName.Replace\\(\"d:\\\\Projetos\\\\POS\\\\exemplo04\\\\\",\"\"\\).Replace\\(\"\\\\\",\"/\"\\) }; Compare-Object $a $b)",
+      "PowerShell($dst = \"d:\\\\Projetos\\\\POS\\\\exemplo_grafana_mcp\"; if \\(Test-Path $dst\\) { \"DESTINO JA EXISTE - abortando\" } else { Rename-Item -Path \"d:\\\\Projetos\\\\POS\\\\exemplo04\" -NewName \"exemplo_grafana_mcp\"; \\(Get-ChildItem $dst -Recurse -File -Force\\).Count })",
+      "PowerShell(git -C \"d:\\\\Projetos\\\\POS\" status --porcelain)",
+      "Skill(windowsfy)",
+      "Skill(windowsfy:*)",
+      "PowerShell(node \"d:\\\\Projetos\\\\POS\\\\.claude\\\\skills\\\\windowsfy\\\\scripts\\\\scan.mjs\" --root \"d:\\\\Projetos\\\\POS\\\\exemplo_grafana_mcp\" --shell ps5 --json)"
     ]
   }
 }
