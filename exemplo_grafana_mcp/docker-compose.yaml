@@ -1,0 +1,32 @@
+# Stack completa do exemplo: infraestrutura de observabilidade + aplicacao de demonstracao.
+#
+# O arquivo original do curso nao existia (o README prometia a "Option 1" mas o
+# docker-compose.yaml da raiz nao veio no repositorio). Toda a infra vem do include
+# abaixo; aqui so acrescentamos o servico da aplicacao "alumnus".
+#
+#   docker compose up            -> infra + app
+#   npm run docker:infra:up      -> so a infra (para rodar o app local com npm start)
+include:
+  - ./infra/docker-compose-infra.yaml
+
+services:
+  alumnus:
+    build: ./_alumnus
+    container_name: alumnus
+    restart: unless-stopped
+    command: pnpm run start
+    ports:
+      - "9000:9000"
+    depends_on:
+      alumnus-postgres:
+        condition: service_healthy
+      opentelemetry-collector:
+        condition: service_started
+    environment:
+      # NODE_ENV=production faz o index.ts disparar requisicoes automaticas a cada 2s,
+      # gerando o trafego que alimenta os dashboards do Grafana.
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=9000
+      - APPNAME=${APPNAME:-alumnus_app}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://alumnus:alumnus_dev_password@alumnus-postgres:5432/alumnus_app}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://opentelemetry-collector:4317}
