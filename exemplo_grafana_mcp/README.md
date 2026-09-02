@@ -87,15 +87,45 @@ repositorio ja' traz os dois arquivos prontos na raiz:
 
 ### 5. Fazer o exercicio
 
-O desafio esta' em [`docs/prompt.md`](./docs/prompt.md): descobrir, **usando so'
-a telemetria**, por que o endpoint `/students/db-leaky-connections` retorna 500.
+O desafio: descobrir **por que** o endpoint `/students/db-leaky-connections`
+retorna 500, usando apenas a telemetria — sem ler o codigo-fonte.
 
-> **Aviso:** o `docs/prompt.md` contem o gabarito (causa raiz, arquivo, linha e
-> a correcao). Se for passar o desafio para outra pessoa, mande apenas o bloco
-> "Single Comprehensive Prompt", nao o arquivo inteiro.
+**Como executar:**
 
-O padrao esperado e' 2 requisicoes com 200 e todas as seguintes com 500. Se ao
-comecar tudo ja' estiver falhando, o pool foi esgotado antes — libere as
+1. Garanta que a infra e a aplicacao estao no ar (passos 2 e 3) e que o MCP do
+   Grafana esta conectado no seu agente (passo 4).
+2. Restaure o padrao de falha (ver logo abaixo).
+3. Abra o [`docs/prompt.md`](./docs/prompt.md), copie **apenas** o bloco de
+   codigo da secao **"Single Comprehensive Prompt"** e cole no chat do seu
+   agente de IA (Claude Code, Copilot Chat, etc.).
+4. O agente deve consultar Prometheus, Loki e Tempo via MCP e produzir um
+   relatorio apontando arquivo e linha da causa raiz.
+
+Em [`docs/grafana-mcp-prompts.md`](./docs/grafana-mcp-prompts.md) ha' prompts
+menores, uteis para explorar a stack antes de encarar a investigacao completa.
+
+> **Aviso — o `docs/prompt.md` contem o gabarito.** Alem do enunciado, o
+> arquivo traz o passo a passo da investigacao, a causa raiz, o arquivo, a
+> linha e a correcao. Nao leia o resto se pretende resolver sozinho, e mande
+> apenas o bloco "Single Comprehensive Prompt" se for passar o desafio adiante.
+
+**Fazendo o teste "as cegas" (recomendado).** Se o agente tiver acesso a este
+repositorio, ele le o codigo e nao investiga nada — o exercicio perde a graca.
+Para valer, crie uma pasta vazia fora deste repositorio contendo so' a config
+do MCP, e abra o agente a partir dela:
+
+```
+investigacao-cega/
+├── .mcp.json     # so' o servidor grafana (copie o da raiz deste repo)
+└── PROMPT.md     # so' o bloco "Single Comprehensive Prompt"
+```
+
+Vale tambem desligar o acesso a web do agente: o repositorio original do curso
+e' publico, entao uma busca acha o codigo e entrega a resposta de graca.
+
+**Padrao de falha esperado:** as 2 primeiras requisicoes retornam 200 e todas as
+seguintes retornam 500 — e' dessa assinatura que se deduz o tamanho do pool. Se
+ao comecar tudo ja' estiver falhando, o pool foi esgotado antes; libere as
 conexoes para restaurar o padrao:
 
 ```bash
